@@ -1,9 +1,30 @@
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { getContacts } from '../../redux/selectors';
 import styles from './ContactForm.module.css';
+import { addContact } from '../../redux/contactsSlice';
 
-function ContactForm({ submitCallback }) {
+function ContactForm() {
+  const dispatch = useDispatch();
+  let list = useSelector(getContacts);
+
+  const handleSubmit = evt => {
+    evt.preventDefault();
+    let name = evt.target[0].value;
+    let number = evt.target[1].value;
+    if (list.filter(contact => contact.name === name).length > 0) {
+      alert(name + ' is already in contacts.');
+      return;
+    }
+    let newContact = {
+      name: name,
+      number: number,
+    };
+    dispatch(addContact(newContact));
+    document.getElementsByTagName('form')[0].reset();
+  };
+
   return (
-    <form className={styles.form} onSubmit={submitCallback}>
+    <form className={styles.form} onSubmit={handleSubmit}>
       <div>
         <span>Name</span>
         <input
@@ -32,9 +53,5 @@ function ContactForm({ submitCallback }) {
     </form>
   );
 }
-
-ContactForm.propTypes = {
-  submitCallback: PropTypes.func.isRequired,
-};
 
 export default ContactForm;
